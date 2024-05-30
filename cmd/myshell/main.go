@@ -71,6 +71,9 @@ func _type(args []string) {
 
 func cd(args []string) {
 	path := args[0]
+	if strings.HasPrefix(path, "~") {
+		path = strings.Replace(path, "~", os.Getenv("HOME"), 1)
+	}
 	if err := os.Chdir(path); err != nil {
 		fmt.Fprintf(os.Stdout, "%s: No such file or directory\n", path)
 	}
