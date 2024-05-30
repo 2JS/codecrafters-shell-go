@@ -48,6 +48,29 @@ func _type(args []string) {
 	case "echo", "exit", "type":
 		fmt.Fprintf(os.Stdout, "%s is a shell builtin\n", command)
 	default:
-		fmt.Fprintf(os.Stdout, "%s not found\n", command)
+		path, err := searchPath(command)
+		if err != nil {
+			fmt.Println(err)
+		} else {
+			fmt.Fprintf(os.Stdout, "%s is %s/%s\n", command, path, command)
+		}
 	}
+}
+
+func searchPath(command string) (string, error) {
+	pathVar := os.Getenv("PATH")
+	paths := strings.Split(pathVar, ":")
+	for _, path := range paths {
+		files, _ := os.ReadDir(path)
+
+		for _, file := range files {
+			if file.IsDir() {
+				continue
+			}
+			if file.Name() == command {
+				return path, nil
+			}
+		}
+	}
+	return "", fmt.Errorf("%s: not found", command)
 }
