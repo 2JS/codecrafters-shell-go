@@ -16,13 +16,26 @@ func main() {
 		command, args := args[0], args[1:]
 		switch command {
 		case "echo":
-			fmt.Fprintf(os.Stdout, "%s\n", strings.Join(args, " "))
+			echo(args)
 		case "exit":
-			if args[0] == "0" {
-				os.Exit(0)
-			}
+			exit(args)
 		default:
-			fmt.Fprintf(os.Stdout, "%s: command not found\n", input)
+			commandNotFound(command)
 		}
 	}
+}
+
+func commandNotFound(command string) {
+	fmt.Fprintf(os.Stdout, "%s: command not found\n", command)
+}
+
+func exit(args []string) {
+	status := args[0]
+	if status == "0" {
+		os.Exit(0)
+	}
+}
+
+func echo(args []string) {
+	fmt.Fprintf(os.Stdout, "%s\n", strings.Join(args, " "))
 }
