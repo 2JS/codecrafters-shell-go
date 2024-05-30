@@ -19,6 +19,8 @@ func main() {
 			echo(args)
 		case "exit":
 			exit(args)
+		case "type":
+			_type(args)
 		default:
 			commandNotFound(command)
 		}
@@ -38,4 +40,14 @@ func exit(args []string) {
 
 func echo(args []string) {
 	fmt.Fprintf(os.Stdout, "%s\n", strings.Join(args, " "))
+}
+
+func _type(args []string) {
+	command := args[0]
+	switch command {
+	case "echo", "exit", "type":
+		fmt.Fprintf(os.Stdout, "%s is a shell builtin\n", command)
+	default:
+		fmt.Fprintf(os.Stdout, "%s not found\n", command)
+	}
 }
