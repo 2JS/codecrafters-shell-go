@@ -16,6 +16,8 @@ func main() {
 		args := strings.Split(input, " ")
 		command, args := args[0], args[1:]
 		switch command {
+		case "cd":
+			cd(args)
 		case "echo":
 			echo(args)
 		case "exit":
@@ -64,5 +66,12 @@ func _type(args []string) {
 		} else {
 			fmt.Fprintf(os.Stdout, "%s is %s\n", command, path)
 		}
+	}
+}
+
+func cd(args []string) {
+	path := args[0]
+	if err := os.Chdir(path); err != nil {
+		fmt.Fprintf(os.Stdout, "%s: No such file or directory\n", path)
 	}
 }
