@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"os/exec"
 	"strings"
 )
 
@@ -22,7 +23,16 @@ func main() {
 		case "type":
 			_type(args)
 		default:
-			commandNotFound(command)
+			path, err := exec.LookPath(command)
+			if err != nil {
+				commandNotFound(command)
+				continue
+			}
+			cmd := exec.Command(path, args...)
+			cmd.Stdin = os.Stdin
+			cmd.Stdout = os.Stdout
+			cmd.Stderr = os.Stderr
+			cmd.Run()
 		}
 	}
 }
@@ -48,29 +58,11 @@ func _type(args []string) {
 	case "echo", "exit", "type":
 		fmt.Fprintf(os.Stdout, "%s is a shell builtin\n", command)
 	default:
-		path, err := searchPath(command)
+		path, err := exec.LookPath(command)
 		if err != nil {
-			fmt.Println(err)
+			fmt.Fprintf(os.Stdout, "%s: not found\n", command)
 		} else {
-			fmt.Fprintf(os.Stdout, "%s is %s/%s\n", command, path, command)
+			fmt.Fprintf(os.Stdout, "%s is %s\n", command, path)
 		}
 	}
-}
-
-func searchPath(command string) (string, error) {
-	pathVar := os.Getenv("PATH")
-	paths := strings.Split(pathVar, ":")
-	for _, path := range paths {
-		files, _ := os.ReadDir(path)
-
-		for _, file := range files {
-			if file.IsDir() {
-				continue
-			}
-			if file.Name() == command {
-				return path, nil
-			}
-		}
-	}
-	return "", fmt.Errorf("%s: not found", command)
 }
